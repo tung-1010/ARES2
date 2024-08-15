@@ -13,8 +13,16 @@
 #define PWM_CHANNEL6 13
 #define PWM_CHANNEL7 14
 #define PWM_CHANNEL8 15
+#include <SimpleKalmanFilter.h>
+SimpleKalmanFilter bo_loc(2, 2, 0.001);
+ 
+float u0 = 100.0; // giá trị thực (không đổi)
+float e; // nhiễu
+float u; // giá trị đo được (có thêm nhiễu)
+float u_kalman; // giá được lọc nhiễu
 // Hàm để thiết lập PWM cho các động cơ
 void setPWMMotors(int c1, int c2, int c3, int c4, int c5, int c6, int c7, int c8) {
+    Serial.begin(9600);
     Serial.print(c1);  // In giá trị c1 lên Serial Monitor
     Serial.print("\t");  // In dấu tab
     Serial.print(c2);  // In giá trị c2 lên Serial Monitor
@@ -94,5 +102,14 @@ void linefollow() {
         pwm.setPWM(11, 4096, 0);  // Thiết lập PWM cho kênh 11 để lùi
         pwm.setPWM(10, 4096, 0);  // Thiết lập PWM cho kênh 10 để lùi
         Serial.print("\nlui");  // In thông báo "lui" lên Serial Monitor
+        randomSeed(millis());
+    e = (float)random(-100, 100);
+    u = u0 + e;
+    Serial.print(u);
+    Serial.print(",");
+    u_kalman = bo_loc.updateEstimate(u);
+    Serial.print(u_kalman);
+    Serial.println();
+}
     }
 }
