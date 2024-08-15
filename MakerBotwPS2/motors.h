@@ -1,7 +1,7 @@
 #include <stdio.h>  // Bao gồm thư viện chuẩn để sử dụng các hàm nhập/xuất chuẩn như printf
 #include "Wire.h"  // Bao gồm thư viện Wire để giao tiếp I2C
 #include "Adafruit_PWMServoDriver.h"  // Bao gồm thư viện Adafruit_PWMServoDriver để điều khiển PWM
-
+#include <SimpleKalmanFilter.h>
 #define MIN_PWM 0  // Định nghĩa giá trị PWM tối thiểu
 #define MAX_PWM 4095  // Định nghĩa giá trị PWM tối đa
 
@@ -15,6 +15,13 @@
 #define PWM_CHANNEL7 14
 #define PWM_CHANNEL8 15
 
+
+SimpleKalmanFilter bo_loc(2, 2, 0.001);
+ 
+float u0 = 100.0; // giá trị thực (không đổi)
+float e; // nhiễu
+float u; // giá trị đo được (có thêm nhiễu)
+float u_kalman; // giá được lọc nhiễu
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();  // Tạo đối tượng pwm từ lớp Adafruit_PWMServoDriver
 
 // Hàm để thiết lập PWM cho các động cơ
